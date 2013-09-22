@@ -94,14 +94,35 @@ switch ($request['collection']) {
 
     break;
   case 'locations':
-    $location_id = $request['itemId'];
-    $location = $mirror_service->locations->get($location_id);
+    $location = $mirror_service->locations->get("latest");
+
+    // Get an xola feed for near us
+    $xolaFeed = file_get_contents("https://dev.xola.com/api/experiences?geo=".$location->getLatitude().",".$location->getLongitude().",100");
+    $xolaStuff = json_decode($xolaFeed);
+    $lat = $xolaStuff->data[0]->geo->lat;
+    $lon = $xolaStuff->data[0]->geo->lon;
+    $category =  $xolaStuff->data[0]->category;
+    $photo = $xolaStuff->data[0]->photo->src;
+
+    $excerpt = $xolaStuff->data[0]->excerpt;
+    $desc = $xolaStuff->data[0]->desc;
+
+    $price = $xolaStuff->data[0]->price;
+    $date = $xolaStuff->data[0]->schedules[0]->dates[0];
+    $name = $xolaStuff->data[0]->name;
+
+
     // Insert a new timeline card, with a copy of that photo attached
     $loc_timeline_item = new Google_TimelineItem();
-    $loc_timeline_item->setText("PHP Quick Start says you are now at " .
-        $location->getLatitude() . " by " . $location->getLongitude());
+    $loc_timeline_item->setHtml("<style>img {max-height:360px;}</style><article>".
+    "<figure><img src='https://dev.xola.com$photo'></figure>".
+    "<section><h1 class='text-large'>$name</h1><p class='text-x-small'>$category</p>".
+    "<hr><p class='text-normal'>$date</p>".
+    "</section></article>");
+    $loc_timeline_item->
 
-    insert_timeline_item($mirror_service, $loc_timeline_item, null, null);
+        insert_timeline_item($mirror_service, $loc_timeline_item, null, null);
+
     break;
   default:
     error_log("I don't know how to process this notification: $request");

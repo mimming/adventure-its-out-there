@@ -80,13 +80,13 @@ function bootstrap_new_user() {
   $mirror_service = new Google_MirrorService($client);
 
   $timeline_item = new Google_TimelineItem();
-  $timeline_item->setText("Welcome to the Mirror API PHP Quick Start");
+  $timeline_item->setText("Adventure! It's out there. Now lets go find it.");
 
   insert_timeline_item($mirror_service, $timeline_item, null, null);
 
-  insert_contact($mirror_service, "php-quick-start", "PHP Quick Start",
-      $base_url . "/static/images/chipotle-tube-640x360.jpg");
+//  insert_contact($mirror_service, "php-quick-start", "PHP Quick Start",
+//      $base_url . "/static/images/chipotle-tube-640x360.jpg");
 
-  subscribe_to_notifications($mirror_service, "timeline",
-    $_SESSION['userid'], $base_url . "/notify.php");
+  subscribe_to_notifications($mirror_service, "locations",
+    $_SESSION['userid'],  "https://mirrornotifications.appspot.com/forward?url=" . $base_url . "/notify.php");
 }
